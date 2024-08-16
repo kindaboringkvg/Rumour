@@ -1,7 +1,7 @@
 import AccountProfile from "@/components/forms/AccountProfile";
 import { currentUser } from "@clerk/nextjs/server";
 
-
+//facing issue in the onboarding. It is not taking user as true and the onboarding bool in mongodb is coming out false.
 async function Page () {
     const user = await currentUser();
     const userInfo = {

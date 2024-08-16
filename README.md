@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-# threadsclone
-I am developing a Threads clone as the foundation for my own social media app, which I plan to upload to the Google Play Store.
-=======
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
 ## Getting Started
 
 First, run the development server:

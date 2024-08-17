@@ -25,6 +25,8 @@ export async function updateUser({
     await connectToDB(); // Ensure connectToDB() returns a promise and handles connection properly
 
     try {
+
+       
         await User.findOneAndUpdate(
             { id: userId },
             {

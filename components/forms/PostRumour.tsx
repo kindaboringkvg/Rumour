@@ -17,7 +17,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { usePathname, useRouter } from "next/navigation";
 
 // import { updateUser } from "@/lib/actions/user.actions";
-import { ThreadValidation } from "@/lib/validations/thread";
+import { RumourValidation } from "@/lib/validations/rumour";
+import { createRumour } from "@/lib/actions/rumour.actions";
 
 interface Props{
     user: {
@@ -31,20 +32,26 @@ interface Props{
     btnTitle: String;
 }
 
-function PostThread({userId} : {userId: string}) {
+function PostRumour({userId} : {userId: string}) {
     const router = useRouter();
     const pathname = usePathname();
     
     const form = useForm({
-        resolver: zodResolver(ThreadValidation),
+        resolver: zodResolver(RumourValidation),
         defaultValues: {
-            thread: '',
+            rumour: '',
             accountId: userId,
         }
     })
 
-    const onSubmit = () => {
+    const onSubmit = async (values : z.infer<typeof RumourValidation>) => {
+      await createRumour({
+        text : values.rumour,
+        author : userId,
+        communityId : null,
+        path : pathname
 
+      });
     }
 
     
@@ -57,7 +64,7 @@ function PostThread({userId} : {userId: string}) {
 
         <FormField
           control={form.control}
-          name="thread"
+          name="rumour"
           render={({ field }) => (
             <FormItem className="flex flex-col w-full gap-3">
               <FormLabel className="text-base-semibold text-light-2">
@@ -65,7 +72,7 @@ function PostThread({userId} : {userId: string}) {
               </FormLabel>
               <FormControl className="no-focus border border-dark-4 bg-dark-3  text-light-1">
                 <Textarea 
-                rows = {15}
+                rows = {5}
                 {...field}
                 />
               </FormControl>
@@ -73,9 +80,13 @@ function PostThread({userId} : {userId: string}) {
             </FormItem>
           )}
         />
+
+        <Button type = "submit" className="bg-primary-500">
+          Spread Rumour
+        </Button>
       </form>
       </Form>
     )
 }
 
-export default PostThread;
+export default PostRumour;

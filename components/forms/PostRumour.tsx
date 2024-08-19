@@ -49,10 +49,12 @@ function PostRumour({userId} : {userId: string}) {
         text : values.rumour,
         author : userId,
         communityId : null,
-        path : pathname
+        path : pathname,
 
       });
-    }
+
+      router.push("/");
+    };
 
     
     return (

@@ -61,9 +61,49 @@ export async function fetchRumours(pageNumber = 1, pageSize = 20) {
 
     const posts = await postsQuery.exec();
 
-    const isNext = totalPostCount > skipAmount + posts.length;
+    const isNext = totalPostCount > (skipAmount + posts.length);
 
     return {posts, isNext};
 
 
+}
+
+export async function fetchRumourById(id : string) {
+    connectToDB();
+
+    try {
+        //todo populate community
+        const rumour = await Rumour.findById(id)
+        .populate({
+            path : 'author',
+            model : User,
+            select : "_id id name image",
+        })
+        .populate({
+            path : 'children',
+            populate : [
+            {
+                path : 'author',
+                model : User,
+                select : "_id id name parentId image",
+
+            },
+            {
+                path : 'children',
+                model : Rumour,
+                populate : {
+                    path : 'author',
+                    model : User,
+                    select : "_id id name parentId image",
+                },
+            },
+        
+        ],
+
+        }).exec();
+
+        return rumour;
+    } catch (error : any) {
+        throw new Error(`Error fetching rumour : ${error.message}`)
+    }
 }

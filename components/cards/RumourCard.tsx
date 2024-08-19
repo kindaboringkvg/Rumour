@@ -39,7 +39,7 @@ const RumourCard = ({
     isComment,
 }: Props) => {
     return (
-        <article>
+        <article className="flex w-full flex-col rounded-xl bg-dark-2 p-7">
             {/* <h2 className = "text-small-regular text-light-2"> {content} </h2> */}
             <div className="flex items-start justify-between">
                 <div className="flex w-full flex-1 flex-row gap-4">
@@ -93,13 +93,13 @@ const RumourCard = ({
                         height = {24}
                         className = "cursor-pointer object-contain"
                         />
-                        <Image
+                        {/* <Image
                         src = "/assets/heart-gray.svg"
                         alt = "heart"
                         width = {24}
                         height = {24}
                         className = "cursor-pointer object-contain"
-                        />
+                        /> */}
                         </div>
                         
                         {isComment && comments.length > 0 && (

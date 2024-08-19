@@ -5,8 +5,9 @@ import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 
 export default async function Home() {
-  const result = await fetchRumours(1,20);
+  const result = await fetchRumours(1, 30);
   const user  = await currentUser();
+  // console.log(result);
   return (
     <>
       <h1 className="head-text text-left">

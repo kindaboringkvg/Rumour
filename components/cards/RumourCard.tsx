@@ -40,7 +40,7 @@ const RumourCard = ({
 }: Props) => {
     return (
         <article>
-
+            {/* <h2 className = "text-small-regular text-light-2"> {content} </h2> */}
             <div className="flex items-start justify-between">
                 <div className="flex w-full flex-1 flex-row gap-4">
                     <div className="flex flex-col items-center">
@@ -70,7 +70,7 @@ const RumourCard = ({
                         height = {24}
                         className = "cursor-pointer object-contain"
                         />
-                        <Link href = {`/runour/${id}`}>
+                        <Link href = {`/rumour/${id}`}>
                             <Image
                             src = "/assets/reply.svg"
                             alt = "reply"
@@ -103,7 +103,7 @@ const RumourCard = ({
                         </div>
                         
                         {isComment && comments.length > 0 && (
-                            <Link href = {`/runour/${id}`}>
+                            <Link href = {`/rumour/${id}`}>
                                 <p className="mt-1 text-subtle-medium">{comments.length} replies</p>
                             </Link>
                         )}

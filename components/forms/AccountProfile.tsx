@@ -21,6 +21,7 @@ import { isBase64Image } from "@/lib/utils";
 import { useUploadThing } from '@/lib/uploadthing' 
 import { updateUser } from "@/lib/actions/user.actions";
 import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Props{
     user: {
@@ -115,14 +116,14 @@ const AccountProfile = ({user, btnTitle} : Props) => {
             <FormItem className="flex items-center gap-4">
               <FormLabel className="account-form_image-label">
                 {field.value ? (
-                    <img 
+                    <Image
                     src = {field.value}
                     alt = "profile photo"
                     width= {96}
                     height= {96}
                     className = "rounded-full object-contain" />
                 ) : (
-                    <img 
+                    <Image
                     src ="/assets/profile.svg"
                     alt = "profile photo"
                     width= {24}

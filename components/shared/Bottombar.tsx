@@ -1,6 +1,7 @@
 "use client"
 
 import { sidebarLinks } from "@/constants";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
@@ -21,7 +22,7 @@ function Bottombar() {
                     key = {link.label}
                     className={`bottombar_link ${isActive && 'bg-primary-500'}`}
                     >
-                        <img 
+                        <Image
                         src = {link.imgURL}
                         alt = {link.label}
                         width = {24}

@@ -2,13 +2,14 @@ import React from "react";
 import Link from "next/link";
 import { OrganizationSwitcher, SignOutButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import Image from "next/image";
 
 function Topbar() {
     return (
         <nav className="topbar">
             <Link href = "/" className="flex
             items-center gap-4">
-                <img src="/assets/logo.svg"
+                <Image src="/assets/logo.svg"
                 alt="logo"
                 width={28}
                 height={28}/>
@@ -25,7 +26,7 @@ function Topbar() {
                         <SignOutButton>
                             <div className="flex
                             cursor-pointer">
-                                <img src = "/assets/logout.svg" 
+                                <Image src = "/assets/logout.svg" 
                                 alt = "logout"
                                 width = {24}
                                 height = {24} />

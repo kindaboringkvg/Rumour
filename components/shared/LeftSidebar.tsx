@@ -3,6 +3,7 @@
 
 import {sidebarLinks} from "@/constants"
 import { SignOutButton, SignedIn, useClerk} from "@clerk/nextjs";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -24,7 +25,7 @@ function LeftSidebar() {
                     key = {link.label}
                     className={`leftsidebar_link ${isActive && 'bg-primary-500'}`}
                     >
-                        <img 
+                        <Image
                         src = {link.imgURL}
                         alt = {link.label}
                         width = {24}
@@ -43,7 +44,8 @@ function LeftSidebar() {
                         <SignOutButton redirectUrl="/sign-in">
                             <div className="flex
                             cursor-pointer gap-4 p-4">
-                                <img src = "/assets/logout.svg" 
+                                <Image 
+                                src = "/assets/logout.svg" 
                                 alt = "logout"
                                 width = {24}
                                 height = {24} />

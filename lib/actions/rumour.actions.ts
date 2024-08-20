@@ -105,3 +105,37 @@ export async function fetchRumourById(id: string) {
         throw new Error(`Error fetching rumour: ${error.message}`);
     }
 }
+
+export async function addCommentToRumour(
+    rumourId : string,
+    commentText  :string,
+    userId : string,
+    path : string,
+) {
+    connectToDB();
+
+    try {
+        const originalRumour = await Rumour.findById(rumourId);
+
+        if(!originalRumour){
+            throw new Error("Rumour not there")
+        }
+
+        const commentRumour = new Rumour({
+            text : commentText,
+            author : userId,
+            parentId : rumourId,
+        })
+
+
+        const savedCommentRumour = await commentRumour.save();
+
+        await originalRumour.save();
+
+        revalidatePath(path);
+
+        originalRumour.children.push(savedCommentRumour._id);
+    } catch (error : any) {
+        throw new Error(`Error adding comment to rumour; ${error.message}`)
+    }
+}

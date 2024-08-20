@@ -115,26 +115,31 @@ export async function addCommentToRumour(
     connectToDB();
 
     try {
+        // Find the original rumour by its ID
         const originalRumour = await Rumour.findById(rumourId);
 
         if(!originalRumour){
             throw new Error("Rumour not there")
         }
 
+        // Create the new comment rumour
         const commentRumour = new Rumour({
             text : commentText,
             author : userId,
-            parentId : rumourId,
+            parentId : rumourId, // Set the parentId to the original rumour's ID
         })
 
-
+        // Save the comment rumour to the database
         const savedCommentRumour = await commentRumour.save();
 
+        //Add the comment thread's ID to the original thread's children array
+        originalRumour.children.push(savedCommentRumour._id);
+
+        // Add the comment rumour's ID to the original rumour's children array
         await originalRumour.save();
 
         revalidatePath(path);
 
-        originalRumour.children.push(savedCommentRumour._id);
     } catch (error : any) {
         throw new Error(`Error adding comment to rumour; ${error.message}`)
     }

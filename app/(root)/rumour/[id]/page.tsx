@@ -15,23 +15,22 @@ const Page = async ({params} : {params : {id : string}}) => {
     const userInfo = await fetchUser(user.id);
     if(!userInfo?.onboarded) redirect('/onboarding')
 
-        const rumour = await fetchRumourById(params.id);
+    const rumour = await fetchRumourById(params.id);
     return (
     <section className="relative">
         <div>
         <RumourCard 
-        key = {rumour._id}
         id = {rumour._id}
         currentUserId = {user?.id || ""}
         parentId = {rumour.parentId}
-        content = {rumour.author}
+        content = {rumour.text}
         author = {rumour.author}  
         community = {rumour.community}
         createdAt = {rumour.createdAt}
         comments = {rumour.children}
         /> 
         </div>
-        <div className="mt-7 ">
+        <div className="mt-7">
             <Comment 
             rumourId = {rumour.id}
             currentUserImg = {user.imageUrl}

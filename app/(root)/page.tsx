@@ -1,5 +1,5 @@
-// src/pages/index.js
 import RumourCard from "@/components/cards/RumourCard";
+import Comment from "@/components/forms/Comment";
 import { fetchRumours } from "@/lib/actions/rumour.actions";
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
@@ -32,8 +32,10 @@ export default async function Home() {
               comments = {post.children}
               />
             ))}
+            
           </>
         )}
+        
       </section>
     </>
       

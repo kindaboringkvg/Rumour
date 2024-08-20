@@ -33,10 +33,27 @@ const Page = async ({params} : {params : {id : string}}) => {
         <div className="mt-7">
             <Comment 
             rumourId = {rumour.id}
-            currentUserImg = {user.imageUrl}
+            currentUserImg = {userInfo.image}
             currentUserId = {JSON.stringify(userInfo._id)}
             />
         </div>
+
+        <div className='mt-10'>
+        {rumour.children.map((childItem: any) => (
+          <RumourCard
+            key={childItem._id}
+            id={childItem._id}
+            currentUserId={user.id}
+            parentId={childItem.parentId}
+            content={childItem.text}
+            author={childItem.author}
+            community={childItem.community}
+            createdAt={childItem.createdAt}
+            comments={childItem.children}
+            isComment
+          />
+        ))}
+      </div>
     </section>
     )
 

@@ -18,7 +18,8 @@ import { usePathname, useRouter } from "next/navigation";
 
 // import { updateUser } from "@/lib/actions/user.actions";
 import { CommentValidation } from "@/lib/validations/rumour";
-import { createRumour } from "@/lib/actions/rumour.actions";
+import { addCommentToRumour, createRumour } from "@/lib/actions/rumour.actions";
+import Image from "next/image";
 
 interface Props {
     rumourId: string;
@@ -26,7 +27,7 @@ interface Props {
     currentUserId: string;
 }
 
-const Comment = ({rumourId, currentUserImg, currentUserId}: Props) => {
+const Comment = ({rumourId, currentUserImg, currentUserId} : Props) => {
     const router = useRouter();
     const pathname = usePathname();
     
@@ -38,33 +39,33 @@ const Comment = ({rumourId, currentUserImg, currentUserId}: Props) => {
     })
 
     const onSubmit = async (values : z.infer<typeof CommentValidation>) => {
-    //   await createRumour({
-    //     text : values.rumour,
-    //     author : userId,
-    //     communityId : null,
-    //     path : pathname,
+      await addCommentToRumour(rumourId, values.rumour, JSON.parse(currentUserId), pathname)
 
-    //   });
-
-      router.push("/");
+      form.reset();
     };
     
     return (
         <Form {...form}>
       <form 
       onSubmit={form.handleSubmit(onSubmit)} 
-      className="flex flex-col justify-start gap-10">
+      className="comment-form">
 
 
         <FormField
           control={form.control}
           name="rumour"
           render={({ field }) => (
-            <FormItem className="flex flex-col w-full gap-3">
-              <FormLabel className="text-base-semibold text-light-2">
-                fixing here
+            <FormItem className="flex items-center w-full gap-3">
+              <FormLabel>
+                <Image 
+                src = {currentUserImg}
+                alt = "profile image"
+                width = {28}
+                height = {28}
+                className="rounded-full object-cover"
+                />
               </FormLabel>
-              <FormControl className="no-focus border border-dark-4 bg-dark-3  text-light-1">
+              <FormControl className="border-none bg-transparent">
                 <Input 
                 type = "text"
                 placeholder="Comment..."
@@ -77,8 +78,8 @@ const Comment = ({rumourId, currentUserImg, currentUserId}: Props) => {
           )}
         />
 
-        <Button type = "submit" className="bg-primary-500">
-          Spread Rumour
+        <Button type = "submit" className="comment-form_btn">
+          Reply
         </Button>
       </form>
       </Form>

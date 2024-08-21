@@ -1,5 +1,6 @@
 import PostRumour from "@/components/forms/PostRumour";
 import ProfileHeader from "@/components/shared/ProfileHeader";
+import RumoursTab from "@/components/shared/RumoursTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import { profileTabs } from "@/constants";
 import { fetchUser } from "@/lib/actions/user.actions";
@@ -60,11 +61,11 @@ const Page = async ({params} : {params : {id : string}}) => {
               className='w-full text-light-1'
             >
               {/* @ts-ignore */}
-              {/* <RumoursTab
+              <RumoursTab
                 currentUserId={user.id}
                 accountId={userInfo.id}
-                accountType='User'
-              /> */}
+                accountType="User"
+              />
             </TabsContent>
           ))}
         </Tabs>

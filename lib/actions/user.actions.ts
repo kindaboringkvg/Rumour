@@ -3,14 +3,35 @@
 import { revalidatePath } from "next/cache";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose";
+import Rumour from "../models/rumour.model";
+import { FilterQuery, SortOrder } from "mongoose";
+import { skip } from "node:test";
+import Community from "../models/community.model";
+
+
+export async function fetchUser(userId: string) {
+  // Ensure the database connection is established
+  await connectToDB(); // Ensure connectToDB() returns a promise and handles connection properly
+
+  try {
+      return await User.findOne({ id: userId })
+          // Uncomment and adjust if you want to populate fields
+          .populate({
+              path: 'communities',
+              model: Community
+          })
+  } catch (error: any) {
+      throw new Error(`Failed to fetch user: ${error.message}`);
+  }
+}
 
 interface Params {
-    userId: string;
-    username: string;
-    name: string;
-    bio: string;
-    image: string;
-    path: string;
+  userId: string;
+  username: string;
+  name: string;
+  bio: string;
+  image: string;
+  path: string;
 }
 
 export async function updateUser({
@@ -47,18 +68,122 @@ export async function updateUser({
     }
 }
 
-export async function fetchUser(userId: string) {
-    // Ensure the database connection is established
-    await connectToDB(); // Ensure connectToDB() returns a promise and handles connection properly
+export async function fetchUserPosts(userId: string) {
+  try {
+    connectToDB();
 
-    try {
-        return await User.findOne({ id: userId })
-            // Uncomment and adjust if you want to populate fields
-            // .populate({
-            //     path: 'communities',
-            //     model: Community
-            // })
-    } catch (error: any) {
-        throw new Error(`Failed to fetch user: ${error.message}`);
-    }
+    // Find all rumours authored by the user with the given userId
+    const rumours = await User.findOne({ id: userId }).populate({
+      path: "rumours",
+      model: Rumour,
+      populate: [
+        {
+          path: "community",
+          model: Community,
+          select: "name id image _id", // Select the "name" and "_id" fields from the "Community" model
+        },
+        {
+          path: "children",
+          model: Rumour,
+          populate: {
+            path: "author",
+            model: User,
+            select: "name image id", // Select the "name" and "_id" fields from the "User" model
+          },
+        },
+      ],
+    });
+    return rumours;
+  } catch (error) {
+    console.error("Error fetching user rumours:", error);
+    throw error;
+  }
 }
+
+export async function fetchUsers({
+    userId,
+    searchString = "",
+    pageNumber = 1,
+    pageSize = 20,
+    sortBy = "desc",
+  }: {
+    userId: string;
+    searchString?: string;
+    pageNumber?: number;
+    pageSize?: number;
+    sortBy?: SortOrder;
+  }) {
+    try {
+      connectToDB();
+  
+      // Calculate the number of users to skip based on the page number and page size.
+      const skipAmount = (pageNumber - 1) * pageSize;
+  
+      // Create a case-insensitive regular expression for the provided search string.
+      const regex = new RegExp(searchString, "i");
+  
+      // Create an initial query object to filter users.
+      const query: FilterQuery<typeof User> = {
+        id: { $ne: userId }, // Exclude the current user from the results.
+      };
+  
+      // If the search string is not empty, add the $or operator to match either username or name fields.
+      if (searchString.trim() !== "") {
+        query.$or = [
+          { username: { $regex: regex } },
+          { name: { $regex: regex } },
+        ];
+      }
+  
+      // Define the sort options for the fetched users based on createdAt field and provided sort order.
+      const sortOptions = { createdAt: sortBy };
+  
+      const usersQuery = User.find(query)
+        .sort(sortOptions)
+        .skip(skipAmount)
+        .limit(pageSize);
+  
+      // Count the total number of users that match the search criteria (without pagination).
+      const totalUsersCount = await User.countDocuments(query);
+  
+      const users = await usersQuery.exec();
+  
+      // Check if there are more users beyond the current page.
+      const isNext = totalUsersCount > skipAmount + users.length;
+  
+      return { users, isNext };
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      throw error;
+    }
+  }
+
+
+  export async function getActivity(userId: string) {
+    try {
+      connectToDB();
+  
+      // Find all rumours created by the user
+      const userRumours = await Rumour.find({ author: userId });
+  
+      // Collect all the child rumour ids (replies) from the 'children' field of each user rumour
+      const childRumourIds = userRumours.reduce((acc, userRumours) => {
+        return acc.concat(userRumours.children);
+      }, []);
+  
+      // Find and return the child rumour (replies) excluding the ones created by the same user
+      const replies = await Rumour.find({
+        _id: { $in: childRumourIds },
+        author: { $ne: userId }, // Exclude rumour authored by the same user
+      }).populate({
+        path: "author",
+        model: User,
+        select: "name image _id",
+      });
+  
+      return replies;
+    } catch (error) {
+      console.error("Error fetching replies: ", error);
+      throw error;
+    }
+  }

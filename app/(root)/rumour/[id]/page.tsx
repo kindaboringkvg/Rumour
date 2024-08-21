@@ -1,6 +1,6 @@
 import RumourCard from "@/components/cards/RumourCard";
 import Comment from "@/components/forms/Comment";
-import { fetchRumourById, fetchRumours } from "@/lib/actions/rumour.actions";
+import { fetchRumourById } from "@/lib/actions/rumour.actions";
 import { fetchUser } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";

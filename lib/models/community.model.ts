@@ -16,9 +16,10 @@ const communitySchema = new mongoose.Schema({
   },
   image: String,
   bio: String,
+  
   CreatedBy : {
     type : mongoose.Schema.Types.ObjectId,
-    ref : 'User'
+    ref : "User",
   },
   rumours: [
     {
@@ -29,7 +30,7 @@ const communitySchema = new mongoose.Schema({
   members : [
     {
     type : mongoose.Schema.Types.ObjectId,
-    ref : 'User'
+    ref : "User",
     }
   ]
 });

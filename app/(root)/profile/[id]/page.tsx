@@ -1,4 +1,3 @@
-import PostRumour from "@/components/forms/PostRumour";
 import ProfileHeader from "@/components/shared/ProfileHeader";
 import RumoursTab from "@/components/shared/RumoursTab";
 import { Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";

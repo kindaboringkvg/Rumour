@@ -1,9 +1,10 @@
-import mongoose from 'mongoose';
+import mongoose, { mongo } from 'mongoose';
 
 let isConnected = false; //if mongoose is connected
 
 export const connectToDB = async () => {
     mongoose.set('strictQuery', true);
+    mongoose.set('strictPopulate', false);
 
     if(!process.env.MONGODB_URL) return console.log('MONGODB_URL not found');
     if(isConnected) return console.log('Already connected to MongoDB');

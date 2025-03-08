@@ -5,6 +5,7 @@ import Rumour from "../models/rumour.model";
 import { connectToDB } from "../mongoose";
 import User from "../models/user.model";
 import { pages } from "next/dist/build/templates/app-page";
+import Community from "../models/community.model";
 
 interface Params {
     text : string,
@@ -31,7 +32,7 @@ export async function createRumour({text, author, communityId, path } : Params) 
     
         revalidatePath(path); 
     } catch (error : any) {
-        throw new Error(`Error creating thread : ${error.message}`)
+        throw new Error(`Error creating rumour : ${error.message}`)
     }
     
 }
@@ -132,7 +133,7 @@ export async function addCommentToRumour(
         // Save the comment rumour to the database
         const savedCommentRumour = await commentRumour.save();
 
-        //Add the comment thread's ID to the original thread's children array
+        //Add the comment rumour's ID to the original rumour's children array
         originalRumour.children.push(savedCommentRumour._id);
 
         // Add the comment rumour's ID to the original rumour's children array
@@ -144,3 +145,71 @@ export async function addCommentToRumour(
         throw new Error(`Error adding comment to rumour; ${error.message}`)
     }
 }
+
+async function fetchAllChildRumours(rumourId: string): Promise<any[]> {
+    const childRumours = await Rumour.find({ parentId: rumourId });
+  
+    const descendantRumours = [];
+    for (const childRumour of childRumours) {
+      const descendants = await fetchAllChildRumours(childRumour._id);
+      descendantRumours.push(childRumour, ...descendants);
+    }
+  
+    return descendantRumours;
+  }
+
+export async function deleteRumour(id: string, path: string): Promise<void> {
+    try {
+      connectToDB();
+  
+      // Find the rumour to be deleted (the main rumour)
+      const mainRumour = await Rumour.findById(id).populate("author community");
+  
+      if (!mainRumour) {
+        throw new Error("Rumour not found");
+      }
+  
+      // Fetch all child Rumours and their descendants recursively
+      const descendantRumours = await fetchAllChildRumours(id);
+  
+      // Get all descendant rumour IDs including the main rumour ID and child rumour IDs
+      const descendantRumourIds = [
+        id,
+        ...descendantRumours.map((rumour) => rumour._id),
+      ];
+  
+      // Extract the authorIds and communityIds to update User and Community models respectively
+      const uniqueAuthorIds = new Set(
+        [
+          ...descendantRumours.map((rumour) => rumour.author?._id?.toString()), // Use optional chaining to handle possible undefined values
+          mainRumour.author?._id?.toString(),
+        ].filter((id) => id !== undefined)
+      );
+  
+      const uniqueCommunityIds = new Set(
+        [
+          ...descendantRumours.map((rumour) => rumour.community?._id?.toString()), // Use optional chaining to handle possible undefined values
+          mainRumour.community?._id?.toString(),
+        ].filter((id) => id !== undefined)
+      );
+  
+      // Recursively delete child rumours and their descendants
+      await Rumour.deleteMany({ _id: { $in: descendantRumourIds } });
+  
+      // Update User model
+      await User.updateMany(
+        { _id: { $in: Array.from(uniqueAuthorIds) } },
+        { $pull: { rumours: { $in: descendantRumourIds } } }
+      );
+  
+      // Update Community model
+      await Community.updateMany(
+        { _id: { $in: Array.from(uniqueCommunityIds) } },
+        { $pull: { rumours: { $in: descendantRumourIds } } }
+      );
+  
+      revalidatePath(path);
+    } catch (error: any) {
+      throw new Error(`Failed to delete rumour: ${error.message}`);
+    }
+  }
